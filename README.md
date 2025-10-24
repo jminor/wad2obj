@@ -1,6 +1,6 @@
 # wad2obj
 
-Convert [WAD levels](https://en.wikipedia.org/wiki/Doom_modding) from the [1993 id Software game, Doom](https://en.wikipedia.org/wiki/Doom_(1993_video_game), into [OBJ 3D models](https://en.wikipedia.org/wiki/Wavefront_.obj_file).
+Convert [WAD levels](https://en.wikipedia.org/wiki/Doom_modding) from the [1993 id Software game, Doom](https://en.wikipedia.org/wiki/Doom_(1993_video_game)), into [OBJ 3D models](https://en.wikipedia.org/wiki/Wavefront_.obj_file).
 
 Level geometry and textures are converted for the most part, but no attempt is made to support lights, objects, monsters, moving platforms/doors, etc.
 
