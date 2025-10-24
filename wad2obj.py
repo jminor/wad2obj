@@ -203,57 +203,59 @@ def _polygons_with_line_definitions(edit, vi, vertexes, textureSizes, polys):
 
         width = math.sqrt((p1.x-p2.x)*(p1.x-p2.x) + (p1.y-p2.y)*(p1.y-p2.y))
 
-        if line.front != -1:
+        if line.front >= 0 and line.front < len(edit.sidedefs):
             side1 = edit.sidedefs[line.front]
-            sector1 = edit.sectors[side1.sector]
+            if side1.sector < len(edit.sectors):
+                sector1 = edit.sectors[side1.sector]
 
-            front_lower_left = vi
-            front_upper_left = vi+1
-            front_lower_right = vi+2
-            front_upper_right = vi+3
-            vertexes.append((p1.x, sector1.z_floor, p1.y))  # lower left
-            vertexes.append((p1.x, sector1.z_ceil,  p1.y))  # upper left
-            vertexes.append((p2.x, sector1.z_floor, p2.y))  # lower right
-            vertexes.append((p2.x, sector1.z_ceil,  p2.y))  # upper right
+                front_lower_left = vi
+                front_upper_left = vi+1
+                front_lower_right = vi+2
+                front_upper_right = vi+3
+                vertexes.append((p1.x, sector1.z_floor, p1.y))  # lower left
+                vertexes.append((p1.x, sector1.z_ceil,  p1.y))  # upper left
+                vertexes.append((p2.x, sector1.z_floor, p2.y))  # lower right
+                vertexes.append((p2.x, sector1.z_ceil,  p2.y))  # upper right
 
-            if not line.two_sided and side1.tx_mid != '-':  # line.impassable:
-                polys.append(_poly_from_components(
-                        side1, sector1,
-                        textureSizes, width, line,
-                        front_lower_left, front_lower_right,
-                        front_upper_right, front_upper_left))
+                if not line.two_sided and side1.tx_mid != '-':  # line.impassable:
+                    polys.append(_poly_from_components(
+                            side1, sector1,
+                            textureSizes, width, line,
+                            front_lower_left, front_lower_right,
+                            front_upper_right, front_upper_left))
 
-            sector1.floor.addSegment(
-                    p1, p2, front_lower_left, front_lower_right)
-            sector1.ceil.addSegment(
-                    p2, p1, front_upper_right, front_upper_left)
+                sector1.floor.addSegment(
+                        p1, p2, front_lower_left, front_lower_right)
+                sector1.ceil.addSegment(
+                        p2, p1, front_upper_right, front_upper_left)
 
-            vi += 4
+                vi += 4
 
-        if line.back != -1:
+        if line.back >= 0 and line.back < len(edit.sidedefs):
             side2 = edit.sidedefs[line.back]
-            sector2 = edit.sectors[side2.sector]
+            if side2.sector < len(edit.sectors):
+                sector2 = edit.sectors[side2.sector]
 
-            back_lower_left = vi
-            back_upper_left = vi+1
-            back_lower_right = vi+2
-            back_upper_right = vi+3
-            vertexes.append((p1.x, sector2.z_floor, p1.y))  # lower left
-            vertexes.append((p1.x, sector2.z_ceil,  p1.y))  # upper left
-            vertexes.append((p2.x, sector2.z_floor, p2.y))  # lower right
-            vertexes.append((p2.x, sector2.z_ceil,  p2.y))  # upper right
+                back_lower_left = vi
+                back_upper_left = vi+1
+                back_lower_right = vi+2
+                back_upper_right = vi+3
+                vertexes.append((p1.x, sector2.z_floor, p1.y))  # lower left
+                vertexes.append((p1.x, sector2.z_ceil,  p1.y))  # upper left
+                vertexes.append((p2.x, sector2.z_floor, p2.y))  # lower right
+                vertexes.append((p2.x, sector2.z_ceil,  p2.y))  # upper right
 
-            if not line.two_sided and side2.tx_mid != '-':  # line.impassable:
-                polys.append(_poly_from_components(
-                        side2, sector2,
-                        textureSizes, width, line,
-                        back_lower_left, back_lower_right,
-                        back_upper_right, back_upper_left))
+                if not line.two_sided and side2.tx_mid != '-':  # line.impassable:
+                    polys.append(_poly_from_components(
+                            side2, sector2,
+                            textureSizes, width, line,
+                            back_lower_left, back_lower_right,
+                            back_upper_right, back_upper_left))
 
-            sector2.floor.addSegment(p2, p1, back_lower_right, back_lower_left)
-            sector2.ceil.addSegment(p1, p2, back_upper_left, back_upper_right)
+                sector2.floor.addSegment(p2, p1, back_lower_right, back_lower_left)
+                sector2.ceil.addSegment(p1, p2, back_upper_left, back_upper_right)
 
-            vi += 4
+                vi += 4
 
         if line.front != -1 and line.back != -1 and line.two_sided:
             # skip the lower texture if it is '-'
@@ -449,4 +451,3 @@ edit = mapedit.MapEditor(map)
 
 if __name__ == "__main__":
     main()
-
