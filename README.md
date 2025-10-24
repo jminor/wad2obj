@@ -4,7 +4,9 @@ Convert [WAD levels](https://en.wikipedia.org/wiki/Doom_modding) from the [1993 
 
 Level geometry and textures are converted for the most part, but no attempt is made to support lights, objects, monsters, moving platforms/doors, etc.
 
-## Setup
+![DOOM Shareware E1M1](E1M1.obj.png)
+
+## Quick Setup (Recommended)
 
 - Install [uv](https://github.com/astral-sh/uv) for fast Python package management
 - run `uvx --from http://github.com/jminor/wad2obj wad2obj -h`
