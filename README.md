@@ -9,10 +9,12 @@ Level geometry and textures are converted for the most part, but no attempt is m
 - Locate, or install, a recent version of [Python](https://www.python.org/).
 - Download `wad2obj.py` (use git, or GitHub's ZIP download button)
 - In your terminal, `cd` into the folder where `wad2obj.py` is.
-- run `pip3 install -r requirements.txt` to install some required libraries ([omgifol](https://github.com/devinacker/omgifol) and [Pillow](https://python-pillow.org/))
-- run `python3 wad2obj.py -h`
+- Install [uv](https://github.com/astral-sh/uv) for fast Python package management
+- run `uv run --with-requirements requirements.txt python3 wad2obj.py -h`
 
 If that produces a helpful message, then you're good to go.
+
+*Alternatively, you can use pip: `pip3 install -r requirements.txt` then run `python3 wad2obj.py -h`*/
 
 ## WAD files
 
@@ -27,7 +29,7 @@ There are loads of Doom mods out there as well, though many of them are only usa
 First, you'll need to get a listing of which maps are present in your WAD file.
 
 ```
-% python3 wad2obj.py /tmp/freedoom1.wad --list
+% uv run --with-requirements requirements.txt python3 wad2obj.py /tmp/freedoom1.wad --list
 Loading /tmp/freedoom1.wad...
 Found 36 maps:
   E1M1
@@ -43,7 +45,7 @@ Found 36 maps:
 Next, you can extract one, or several, maps like this. Note that `wad2obj.py` will output all the textures as well, so you want to send the output into a folder.
 
 ```
-% python3 wad2obj.py /tmp/freedoom1.wad --maps E1M1 --center --output /tmp/freedoom_objs/
+% uv run --with-requirements requirements.txt python3 wad2obj.py /tmp/freedoom1.wad --maps E1M1 --center --output /tmp/freedoom_objs/
 Loading /tmp/freedoom1.wad...
 ERROR: Cannot find patch named 'TFOGF0' for texture_definition 'SLAD10'
 ERROR: Cannot find patch named 'TFOGI0' for texture_definition 'SLAD10'
