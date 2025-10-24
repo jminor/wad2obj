@@ -11,6 +11,8 @@ import math
 import argparse
 import os
 import sys
+from pathlib import Path
+from typing import List, Tuple, Dict, Optional, Any
 
 # PIL
 from PIL import Image
@@ -32,7 +34,7 @@ Ns 0.000000
 """
 
 
-def linked_a_chain_from(chains, remaining_segments):
+def linked_a_chain_from(chains: List[List[Any]], remaining_segments: List[Any]) -> bool:
     for chain in chains:
         end = chain[-1]
         # compare the actual coordinates of the start of this segment (segment)
@@ -53,31 +55,31 @@ class Polygon:
     polygons.  Also used for wall segments which are actually simple polygons.
     """
 
-    def __init__(self, texture=None):
-        self.vertices = []
-        self.segments = []
-        self.texture = texture
-        self.faces = []
-        self.textureCoords = []
+    def __init__(self, texture: Optional[str] = None):
+        self.vertices: List[Tuple[float, float, float]] = []
+        self.segments: List[Tuple[Any, Any, Any, Any]] = []
+        self.texture: Optional[str] = texture
+        self.faces: List[List[int]] = []
+        self.textureCoords: List[List[Tuple[float, float]]] = []
 
-    def getFaces(self):
+    def getFaces(self) -> List[List[int]]:
         return self.faces
 
-    def getTextureCoords(self):
+    def getTextureCoords(self) -> List[List[Tuple[float, float]]]:
         return self.textureCoords
 
-    def addFace(self, face, textureCoords):
+    def addFace(self, face: List[int], textureCoords: List[Tuple[float, float]]) -> None:
         self.faces.append(face)
         self.textureCoords.append(textureCoords)
 
-    def addSegment(self, p1, p2, a, b):
+    def addSegment(self, p1: Any, p2: Any, a: Any, b: Any) -> None:
         """
         Feed us one line segment at a time, then call combineSegments()
         """
 
         self.segments.append((p1, p2, a, b))
 
-    def combineSegments(self):
+    def combineSegments(self) -> None:
         """ Take all line segments we were given and try to combine them into
         faces.
         """
@@ -110,7 +112,7 @@ class Polygon:
             for chain in chains]
 
 
-def objmap(wad, name, filename, textureNames, textureSizes, centerVerts):
+def objmap(wad, name: str, filename: str, textureNames: List[str], textureSizes: Dict[str, Tuple[int, int]], centerVerts: bool) -> None:
     edit = mapedit.MapEditor(wad.maps[name])
 
     # first lets get into the proper coordinate system
@@ -149,25 +151,21 @@ def objmap(wad, name, filename, textureNames, textureSizes, centerVerts):
     ti = 1  # vertex texture index (starting at 1 for the 1st "vt" statement)
 
     with open(filename, "w") as out:
-        out.write("# %s\n" % name)
+        out.write(f"# {name}\n")
         out.write("mtllib doom.mtl\n")
-        out.write("o %s\n" % name)
+        out.write(f"o {name}\n")
 
         # here are all the vertices - in order, so you can index them (starting
         # at 1) note that we stretch them to compensate for Doom's non-square
         # pixel display
         for v in vertexes:
             out.write(
-                "v %g %g %g\n" % (
-                    v[0]-center.x,
-                    v[1]*1.2,
-                    v[2]-center.y
-                )
+                f"v {v[0]-center.x:g} {v[1]*1.2:g} {v[2]-center.y:g}\n"
             )
 
         for polyindex, poly in enumerate(polys):
             if not poly.texture:
-                print("Polygon with no texture?", poly)
+                print(f"Polygon with no texture? {poly}")
                 continue
 
             if poly.texture == '-' or poly.texture == 'F_SKY1':
@@ -175,13 +173,13 @@ def objmap(wad, name, filename, textureNames, textureSizes, centerVerts):
                 continue
 
             # polyindex starts at 1, enumerate starts at 0
-            out.write("g %s.%d %s\n" % (poly.texture, polyindex + 1, name))
+            out.write(f"g {poly.texture}.{polyindex + 1} {name}\n")
 
             texture_name = poly.texture
             if poly.texture not in textureNames:
-                print("Missing texture", poly.texture)
+                print(f"Missing texture {poly.texture}")
                 texture_name = "None"
-            out.write("usemtl %s\n" % texture_name)
+            out.write(f"usemtl {texture_name}\n")
 
             for vindexes, textureCoords in zip(
                     poly.getFaces(),
@@ -189,16 +187,11 @@ def objmap(wad, name, filename, textureNames, textureSizes, centerVerts):
 
                 tindexes = []
                 for u, v in textureCoords:
-                    out.write("vt %g %g\n" % (u, v))
+                    out.write(f"vt {u:g} {v:g}\n")
                     tindexes.append(ti)
                     ti += 1
                 out.write(
-                        "f %s\n" % " ".join(
-                            [
-                                "%s/%s" % (v, t)
-                                for v, t in zip(vindexes, tindexes)
-                            ]
-                        )
+                        f"f {' '.join([f'{v}/{t}' for v, t in zip(vindexes, tindexes)])}\n"
                 )
 
 
@@ -348,51 +341,51 @@ def _sectors_with_floor_and_ceil_added(sectors):
         sector.floor = Polygon(texture=sector.tx_floor)
         sector.ceil = Polygon(texture=sector.tx_ceil)
 
-def writemtl(wad):
-    out = open("doom.mtl", "w")
-    out.write("# doom.mtl\n")
+def writemtl(wad) -> Tuple[List[str], Dict[str, Tuple[int, int]]]:
+    with open("doom.mtl", "w") as out:
+        out.write("# doom.mtl\n")
 
-    names = []
-    textureSizes = {}
+        names = []
+        textureSizes = {}
 
-    # + wad.patches.items() # + wad.graphics.items() + wad.sprites.items()
-    textures = list(wad.flats.items())
+        # + wad.patches.items() # + wad.graphics.items() + wad.sprites.items()
+        textures = list(wad.flats.items())
 
-    for name, texture in textures:
-        texture.to_file(name+".png")
-        _texture_written_to(out, name)
-        names.append(name)
+        for name, texture in textures:
+            texture.to_file(f"{name}.png")
+            _texture_written_to(out, name)
+            names.append(name)
 
-    t = txdef.Textures(wad.txdefs)
-    for name,texture_definition in list(t.items()):
-        image = Image.new(
-                'RGB',
-                (texture_definition.width, texture_definition.height))
-        # print "making %s at %dx%d" % (name, txdef.width, txdef.height)
-        for patchdef in texture_definition.patches:
-            # sometimes there are lower case letters!?
-            patchdef.name = patchdef.name.upper()
-            if patchdef.name not in wad.patches:
-                print(("ERROR: Cannot find patch named '%s' for "
-                        "texture_definition '%s'" % (patchdef.name, name)))
-                continue
-            patch = wad.patches[patchdef.name]
-            stamp = patch.to_Image()
-            image.paste(stamp, (patchdef.x,patchdef.y))
-        image.save(name+".png")
-        textureSizes[name] = image.size
+        t = txdef.Textures(wad.txdefs)
+        for name,texture_definition in list(t.items()):
+            image = Image.new(
+                    'RGB',
+                    (texture_definition.width, texture_definition.height))
+            # print "making %s at %dx%d" % (name, txdef.width, txdef.height)
+            for patchdef in texture_definition.patches:
+                # sometimes there are lower case letters!?
+                patchdef.name = patchdef.name.upper()
+                if patchdef.name not in wad.patches:
+                    print(f"ERROR: Cannot find patch named '{patchdef.name}' for "
+                            f"texture_definition '{name}'")
+                    continue
+                patch = wad.patches[patchdef.name]
+                stamp = patch.to_Image()
+                image.paste(stamp, (patchdef.x,patchdef.y))
+            image.save(f"{name}.png")
+            textureSizes[name] = image.size
 
-        _texture_written_to(out, name)
-        names.append(name)
+            _texture_written_to(out, name)
+            names.append(name)
 
     return names, textureSizes
 
 def _texture_written_to(out, name):
-    out.write("\nnewmtl %s\n" % name)
+    out.write(f"\nnewmtl {name}\n")
     out.write(DEFAULT_MTL_TEXT)
-    out.write("map_Kd %s.png\n" % name)
+    out.write(f"map_Kd {name}.png\n")
 
-def parse_args():
+def parse_args() -> argparse.Namespace:
     """ parse arguments out of sys.argv """
 
     epilog = "Example: wad2obj.py doom.wad -m 'E1*' -o /tmp"
@@ -414,17 +407,17 @@ def parse_args():
             help="Translate the output vertices so the center of the map is at the origin.")
     return parser.parse_args()
 
-def main():
+def main() -> None:
     args = parse_args()
 
-    print("Loading %s..." % args.source_wad)
+    print(f"Loading {args.source_wad}...")
     inwad = wad.WAD()
     inwad.from_file(args.source_wad)
 
     if args.list:
-        print("Found %d maps:" % len(inwad.maps))
+        print(f"Found {len(inwad.maps)} maps:")
         for mapName in list(inwad.maps.keys()):
-            print("  %s" % mapName)
+            print(f"  {mapName}")
         sys.exit(0)
 
     # lets make sure all output files are written here
@@ -436,12 +429,12 @@ def main():
 
     maps = inwad.maps.find(args.maps)
     if len(maps) == 0:
-        print("No maps matching pattern '%s' were found." % (args.maps))
+        print(f"No maps matching pattern '{args.maps}' were found.")
     else:
-        print("Found %d maps matching pattern '%s'" % (len(maps), args.maps))
+        print(f"Found {len(maps)} maps matching pattern '{args.maps}'")
         for name in maps:
-            objfile = name+".obj"
-            print("Writing %s" % objfile)
+            objfile = f"{name}.obj"
+            print(f"Writing {objfile}")
             objmap(inwad, name, objfile, textureNames, textureSizes, args.center)
 
 """
