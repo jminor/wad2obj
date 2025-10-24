@@ -16,6 +16,7 @@ shareware: dls/DOOM1.WAD
 	uv run wad2obj $< -m E1M1 -o out
 
 dls/freedoom.zip:
+	mkdir -p dls
 	curl -L -o $@ https://github.com/freedoom/freedoom/releases/download/v0.13.0/freedoom-0.13.0.zip
 
 dls/freedoom1.wad: dls/freedoom.zip
