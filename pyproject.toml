@@ -1,0 +1,11 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wad2obj"
+version = "0.1.0"
+dependencies = [
+    "omgifol>=0.4.0",
+    "Pillow>=10.0.0",
+]
