@@ -2,3 +2,6 @@ out/
 dls/
 __pycache__/
 venv/
+.venv/
+build/
+wad2obj.egg-info/

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 __doc__ = """
 Extracts textures and map geometry from a WAD file into an OBJ file,
