@@ -6,12 +6,19 @@ Level geometry and textures are converted for the most part, but no attempt is m
 
 ![DOOM Shareware E1M1](E1M1.obj.png)
 
+## Super Quick Setup
+
+- Install [uv](https://github.com/astral-sh/uv) for fast Python package management
+- No need to clone or download this repository. Uv will do it for you.
+- Run `uvx --from http://github.com/jminor/wad2obj.git wad2obj -h`
+
+If that produces a helpful message, then you're good to go.
+
 ## Quick Setup (Recommended)
 
 - Install [uv](https://github.com/astral-sh/uv) for fast Python package management
-- run `uvx --from http://github.com/jminor/wad2obj wad2obj -h`
-
-If that produces a helpful message, then you're good to go.
+- Clone the repository: `git clone https://github.com/jminor/wad2obj` (or download the ZIP file)
+- In your terminal, `cd` into the folder where `wad2obj.py` is.
 
 Now run `make shareware` or `make freedoom` to download, unzip, and convert E1M1 from one of those WAD files.
 
