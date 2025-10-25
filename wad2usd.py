@@ -90,13 +90,16 @@ class Polygon:
             [(segment[0].x/64., segment[0].y/64.) for segment in chain])
             for chain in chains]
 
+        # Reverse faces and texture coords for correct winding
+        self.faces = [face[::-1] for face in self.faces]
+        self.textureCoords = [coords[::-1] for coords in self.textureCoords]
+
 
 def linked_a_chain_from(chains: List[List[Any]], remaining_segments: List[Any]) -> bool:
     for chain in chains:
         end = chain[-1]
-        # compare the actual coordinates of the start of this segment (segment)
-        # versus the end of the chain (end)
-        for segment in (s for s in remaining_segments if s[1] == end[0]):
+        # compare the start of this segment versus the end of the chain
+        for segment in (s for s in remaining_segments if s[0] == end[1]):
             # they match, so extend this chain
             chain.append(segment)
             remaining_segments.remove(segment)
@@ -157,12 +160,12 @@ def usdmap(wad, name: str, filename: str, textureNames: List[str], textureSizes:
         shader.CreateIdAttr('UsdPreviewSurface')
         texture = UsdShade.Shader.Define(stage, f'{material_path}/texture')
         texture.CreateIdAttr('UsdUVTexture')
-        texture.CreateInput('file', Sdf.ValueTypeNames.Asset).Set(f'{tex_name}.png')
+        texture.CreateInput('file', Sdf.ValueTypeNames.Asset).Set(os.path.abspath(f'{tex_name}.png'))
         texture.CreateInput('st', Sdf.ValueTypeNames.Token).Set('st')
         shader.CreateInput('diffuseColor', Sdf.ValueTypeNames.Color3f).ConnectToSource(texture.CreateOutput('rgb', Sdf.ValueTypeNames.Color3f))
 
     # global points
-    points = Vt.Vec3fArray([Gf.Vec3f(v[0]-center.x, v[1]*1.2, v[2]-center.y) for v in vertexes])
+    points = Vt.Vec3fArray([Gf.Vec3f(v[0]-center.x, v[1], v[2]-center.y) for v in vertexes])
 
     # add meshes
     mesh_index = 0
