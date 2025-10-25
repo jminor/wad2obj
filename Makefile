@@ -1,7 +1,8 @@
 help:
 	@echo "Available targets:"
-	@echo "  shareware - Download and process Doom shareware WAD"
-	@echo "  freedoom  - Download and process Freedoom WAD"
+	@echo "  shareware     - Download and process Doom shareware WAD"
+	@echo "  shareware-usd - Download and process Doom shareware WAD to USD"
+	@echo "  freedoom      - Download and process Freedoom WAD"
 
 dls/doom-shareware.zip:
 	mkdir -p dls
@@ -14,6 +15,11 @@ shareware: dls/DOOM1.WAD
 	uv run wad2obj $< --list
 	mkdir -p out
 	uv run wad2obj $< -m E1M1 -o out
+
+shareware-usd: dls/DOOM1.WAD
+	uv run wad2usd $< --list
+	mkdir -p out
+	uv run wad2usd $< --maps E1M1 --output out
 
 dls/freedoom.zip:
 	mkdir -p dls
